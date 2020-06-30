@@ -1,21 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using Xamarin.Forms;
 
 namespace BioAuth
 {
-    // Learn more about making custom code visible in the Xamarin.Forms previewer
-    // by visiting https://aka.ms/xamarinforms-previewer
     [DesignTimeVisible(false)]
-    public partial class MainPage : ContentPage
+    public partial class MainPage : ContentPage, IBioAuthCompleted
     {
         public MainPage()
         {
             InitializeComponent();
+            MessagingCenter.Subscribe<MainPage, string>(this, "BioAuth", async (senderMsg, arg) =>
+            {
+                // Do something whenever the "Hi" message is received
+                await DisplayAlert("Message received", "arg=" + arg, "OK");
+            });
+        }
+
+        public async void OnCompleted(BioAuthStatus status)
+        {
+            await DisplayAlert("Message received", status.ToString(), "OK");
+        }
+
+        void Button_Clicked(System.Object sender, System.EventArgs e)
+        {
+            DependencyService.Get<IBiometricProvider>().Authenticate(this);
         }
     }
 }
